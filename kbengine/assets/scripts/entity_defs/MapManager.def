@@ -1,0 +1,18 @@
+<root>
+	<Properties>
+		<mapType>
+			<Type>	STRING					</Type>
+			<Flags>	ALL_CLIENTS				</Flags>
+		</mapType>
+	</Properties>
+
+	<ClientMethods>
+	</ClientMethods>
+
+	<BaseMethods>
+	</BaseMethods>
+
+	<CellMethods>
+	</CellMethods>
+
+</root>

@@ -1,0 +1,66 @@
+<root>
+
+  <DBID>  UINT64  </DBID>
+
+  <ITEMINFO>  FIXED_DICT
+      <Properties>
+        <Id>        
+          <Type>INT32</Type>        
+        </Id>
+        <Amount>
+          <Type>INT32</Type>        
+        </Amount>
+      </Properties>
+  </ITEMINFO>
+
+  <ROLEITEMS>  FIXED_DICT
+    <Properties>
+      <Items>
+        <Type>  ARRAY  <of>  ITEMINFO  </of>  </Type>
+      </Items>  
+    </Properties>
+  </ROLEITEMS>
+
+  <ROLEITEM>  FIXED_DICT
+    <Properties>
+      <Id>        
+        <Type>INT32</Type>        
+      </Id>
+      <Name>
+        <Type>STRING</Type>        
+      </Name>
+      <Map>
+        <Type>STRING</Type>        
+      </Map>
+    </Properties>
+  </ROLEITEM>
+  <ROLEINFO>  FIXED_DICT
+    <Properties>
+      <Items>
+        <Type>  ARRAY  <of>  ROLEITEM  </of>  </Type>
+      </Items>  
+    </Properties>
+  </ROLEINFO>
+
+  <CREATEMONSTERARG>  FIXED_DICT
+    <Properties>
+      <ClassName>
+        <Type>STRING</Type>        
+      </ClassName>
+      <PlayerName>
+        <Type>STRING</Type>        
+      </PlayerName>
+      <Position>
+        <Type>VECTOR3</Type>        
+      </Position>
+    </Properties>
+  </CREATEMONSTERARG>
+  <CREATEMONSTERARGS>  FIXED_DICT
+    <Properties>
+      <Items>
+        <Type>  ARRAY  <of>  CREATEMONSTERARG  </of>  </Type>
+      </Items>  
+    </Properties>
+  </CREATEMONSTERARGS>
+
+</root>

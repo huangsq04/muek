@@ -1,0 +1,42 @@
+<root>
+	<Volatile>
+		<position/>
+		<yaw/>
+		<pitch/>
+		<roll/>
+	</Volatile>
+
+	<Properties>
+        <PlayerName>
+            <Type>    STRING </Type>
+            <Flags>            ALL_CLIENTS            </Flags>
+        </PlayerName>
+		<MoveSpeed>
+			<Type>	FLOAT					</Type>
+			<Flags>	ALL_CLIENTS				</Flags>
+		</MoveSpeed>
+
+		<AnimState>
+			<Type>	UINT8				</Type>
+			<Flags>	ALL_CLIENTS				</Flags>
+		</AnimState>
+	</Properties>
+
+	<ClientMethods>
+        <OnFire>
+            <Arg Name=Position>   VECTOR3   </Arg>
+            <Arg Name=Rotation>   VECTOR3   </Arg>
+        </OnFire>
+	</ClientMethods>
+
+	<BaseMethods>
+		
+	</BaseMethods>
+
+	<CellMethods>
+        <ControllMonster>
+            <Exposed/>
+            <Arg Name=ID>   INT32    </Arg>
+        </ControllMonster>
+	</CellMethods>
+</root>

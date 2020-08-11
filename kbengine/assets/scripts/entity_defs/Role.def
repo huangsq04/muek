@@ -1,0 +1,74 @@
+<root>
+    <Volatile>
+        <position/>
+        <yaw/>
+        <pitch/>
+        <roll/>
+    </Volatile>
+
+    <Properties>
+        <ParentDBID>
+            <Type> INT32 </Type>
+            <Flags> ALL_CLIENTS </Flags>
+            <Persistent> true </Persistent>
+        </ParentDBID>
+        <PlayerName>
+            <Type> STRING </Type>
+            <Flags> ALL_CLIENTS </Flags>
+            <Persistent> true </Persistent>
+        </PlayerName>
+		<EXP>
+			<Type> INT32 </Type>
+			<Flags> ALL_CLIENTS </Flags>
+            <Persistent> true </Persistent>
+		</EXP>
+		<HP>
+			<Type> INT32 </Type>
+			<Flags> ALL_CLIENTS </Flags>
+            <Persistent> true </Persistent>
+		</HP>
+		<ItemList>
+            <Type> ROLEITEMS </Type>
+			<Flags>	ALL_CLIENTS	</Flags>
+            <Persistent>  true  </Persistent>
+		</ItemList>
+        <Map>
+            <Type> STRING </Type>
+            <Flags> ALL_CLIENTS </Flags>
+            <Persistent> true </Persistent>
+        </Map>
+    </Properties>
+
+    <ClientMethods>
+        <ReqFire>
+            <Arg Name=Position>   VECTOR3   </Arg>
+            <Arg Name=Rotation>   VECTOR3   </Arg>
+        </ReqFire>
+        <OnFire>
+            <Arg Name=Position>   VECTOR3   </Arg>
+            <Arg Name=Rotation>   VECTOR3   </Arg>
+        </OnFire>
+    </ClientMethods>
+
+    <BaseMethods>
+        <OnLeaveWorld>
+            <Exposed/>
+        </OnLeaveWorld>
+        <logoff>
+            <Exposed/>
+        </logoff>
+    </BaseMethods>
+
+    <CellMethods>
+        <LevelTeleport>
+            <Exposed/>
+            <Arg Name=MapName>   STRING    </Arg>
+            <Arg Name=Position>   VECTOR3    </Arg>
+        </LevelTeleport>
+        <CreateMonster>
+            <Exposed/>
+            <Arg Name=PlayerName>   STRING    </Arg>
+            <Arg Name=Position>   VECTOR3    </Arg>
+        </CreateMonster>
+    </CellMethods>
+</root>

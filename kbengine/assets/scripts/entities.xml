@@ -1,0 +1,7 @@
+<root>
+    <Account hasBase="true"  hasClient="true"></Account>
+    <Role   hasCell="true" hasBase="true" hasClient="true"></Role>
+    <Agent   hasCell="true" hasBase="true" hasClient="true"></Agent>
+    <Monster hasCell="true"  hasClient="true"></Monster>
+    <MapManager/>
+</root>

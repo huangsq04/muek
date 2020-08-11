@@ -1,0 +1,55 @@
+<root>
+    <Volatile>
+        <position/>
+        <yaw/>
+        <pitch/>
+        <roll/>
+    </Volatile>
+
+    <Properties>
+        <AuthorityType>
+            <Type> INT32 </Type>
+            <Flags> BASE_AND_CLIENT </Flags>
+            <Persistent> true </Persistent>
+        </AuthorityType>
+        <RoleList>
+            <Type> ROLEINFO </Type> 
+            <Flags> BASE_AND_CLIENT </Flags>
+        </RoleList>
+
+    </Properties>
+
+    <ClientMethods>
+        <RespCreatePlayer>
+            <Arg Name=ID>    INT32    </Arg>
+            <Arg Name=RoleName>    STRING    </Arg>
+        </RespCreatePlayer>
+        <RespGetRoleInfo>
+            <Exposed/>
+            <Arg>    ROLEINFO    </Arg>
+        </RespGetRoleInfo>
+    </ClientMethods>
+
+    <BaseMethods>
+        <PlayerEnter>
+            <Exposed/>
+            <Arg Name=ID>    INT32    </Arg>
+            <Arg Name=MapName>    STRING    </Arg>
+        </PlayerEnter>
+        <OnCreatePlayer>
+            <Exposed/>
+            <Arg>    STRING    </Arg>
+        </OnCreatePlayer>
+        <Logoff>
+            <Exposed/>
+        </Logoff>
+        <GetRoleInfo>
+            <Exposed/>
+        </GetRoleInfo>
+
+    </BaseMethods>
+
+    <CellMethods>
+    </CellMethods>
+
+</root>

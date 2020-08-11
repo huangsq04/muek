@@ -1,0 +1,140 @@
+<root>
+	<bitsPerSecondToClient> 200000 </bitsPerSecondToClient>				<!-- Type: Integer -->	
+	<trace_packet>
+		<debug_type>0</debug_type>
+	</trace_packet>
+	<channelCommon> 
+		<timeout> 
+			<internal> 600.0 </internal>
+			<external> 600.0 </external>
+		</timeout>
+		<readBufferSize> 
+			<internal>	16777216	</internal> 			<!-- 16M -->
+			<external>	0			</external>				<!-- 系统默认(system default) -->
+		</readBufferSize>
+		<writeBufferSize> 
+			<internal>	16777216	</internal>				<!-- 16M -->
+			<external>	0			</external>				<!-- 系统默认(system default) -->
+		</writeBufferSize>
+		<windowOverflow>
+			<send>
+				<messages>
+					<critical>	1024		</critical>
+					<internal>	65535		</internal>
+					<external>	512			</external>
+				</messages>
+				<bytes>
+					<internal>	0			</internal>
+					<external>	0			</external>
+				</bytes>
+			</send>
+			
+			<receive>
+				<messages>
+					<critical>	24			</critical>
+					<internal>	65535		</internal>
+					<external>	64			</external>
+				</messages>
+				<bytes>
+					<internal>	0			</internal>
+					<external>	4096		</external>
+				</bytes>
+			</receive>
+		</windowOverflow>
+		<encrypt_type> 1 </encrypt_type>
+	</channelCommon> 	
+	
+	<app_publish>0</app_publish>
+	<dbmgr>
+		<debug> false </debug>
+		<allowEmptyDigest> false </allowEmptyDigest>					<!-- Type: Boolean -->
+		<internalInterface>  </internalInterface>
+		<InterfacesServiceAddr>
+			<enable> false		</enable>
+			<host>	 localhost	</host>
+			<port>	 30099		</port>
+		</InterfacesServiceAddr>
+
+		<dbAccountEntityScriptType>	Account	</dbAccountEntityScriptType>
+		
+		<databaseInterfaces>
+			<default>
+				<type> mysql </type>											<!-- Type: String -->
+				<host> 172.16.0.22 </host>
+				<port> 3306 </port>												<!-- Type: Integer -->
+				<databaseName> kbe </databaseName>
+				<numConnections> 5 </numConnections>							<!-- Type: Integer -->
+				<auth>
+					<username> csol </username>									<!-- Type: String -->
+					<password> 123456 </password>								<!-- Type: String -->
+					<encrypt>false</encrypt>
+				</auth>
+			</default>
+		</databaseInterfaces>
+
+		<account_system> 
+			<accountEntityScriptType>	Account	</accountEntityScriptType>
+			<accountDefaultFlags> 0 </accountDefaultFlags>							<!-- Type: Integer -->
+			<accountDefaultDeadline> 0 </accountDefaultDeadline>						<!-- Type: Integer -->
+			<account_registration> 
+				<enable>	true	</enable>
+				<loginAutoCreate> true </loginAutoCreate>
+			</account_registration>
+		</account_system>
+	</dbmgr>
+	
+	<cellapp>
+		<coordinate_system> 
+			<enable> true </enable>
+			<rangemgr_y> false </rangemgr_y>
+			<entity_posdir_additional_updates> 2 </entity_posdir_additional_updates>
+		</coordinate_system>
+	</cellapp>
+	
+	<baseapp>
+		<archivePeriod> 300 </archivePeriod> 							<!-- Type: Float -->
+		<backupPeriod> 0 </backupPeriod>								<!-- Type: Float -->
+		<externalPorts_min> 20015 </externalPorts_min>                                  <!-- Type: Integer -->
+		<externalPorts_max> 20017 </externalPorts_max>                                  <!-- Type: Integer -->
+	</baseapp>
+	
+	<cellappmgr>
+	</cellappmgr>
+	
+	<baseappmgr>
+	</baseappmgr>
+	
+	<loginapp>
+		<internalInterface>  </internalInterface>
+		<externalInterface>  </externalInterface>						<!-- Type: String -->
+
+	</loginapp>	
+	
+	<interfaces>
+		<host>  </host>
+		<port>  	</port>
+		
+	</interfaces>
+
+	<logger>
+	</logger>
+
+	<machine>
+		<internalInterface>  </internalInterface>
+		<externalInterface>  </externalInterface>						<!-- Type: String -->
+	</machine>
+	
+	<bots>
+		<host> 127.0.0.1 </host>										<!-- Type: String -->
+		<port> 20013 </port>											<!-- Type: Integer -->
+		
+		<isOnInitCallPropertysSetMethods> false </isOnInitCallPropertysSetMethods>
+		
+		<defaultAddBots> 
+			<totalCount> 50  </totalCount>								<!-- Type: Integer -->
+			<tickTime> 0.1  </tickTime>									<!-- Type: Float -->
+			<tickCount> 5  </tickCount>									<!-- Type: Integer -->
+		</defaultAddBots>
+	</bots>
+
+</root>
