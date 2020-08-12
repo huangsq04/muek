@@ -271,6 +271,13 @@ void AMUEKGameMode::KBEEnterSpace(const FString &Name)
 		return;
 	}
 
+	if (RoleItem->Map == TEXT(""))
+	{
+		FString Msg = *FString::Printf(TEXT("Not map select %s"), *Name);
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, *Msg);
+		return;
+	}
+
 	FString OptionString = *FString::Printf(TEXT("%s?LoginName=%s?LoginType=%d?Id=%d"), *RoleItem->Map, *LoginName, LoginType, RoleItem->Id);
 	GetWorld()->SeamlessTravel(OptionString);
 }

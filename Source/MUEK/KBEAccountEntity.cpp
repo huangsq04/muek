@@ -15,7 +15,7 @@ void UKBEAccountEntity::RespCreatePlayer_Implementation(const int32 ID, const FS
 	}
 	else
 	{
-		RoleList.Items.Add({ ID, RoleName });
+		RoleList.Items.Add({ ID, RoleName, TEXT("MapA") });
 		AMUEKGameMode *GameMode = Cast<AMUEKGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 		if (GameMode)
 		{

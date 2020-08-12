@@ -75,21 +75,27 @@ void AKBECharacter::OnUpdateEntityMovement()
 	static float ScaledHeight = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 	static float Height = GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight();
 
+	FVector LinearVelocity;
+
 	if (MovementMode == MOVE_Walking)
 	{
 		GetFloorPoint(AdjPoint, TargetHits, Radius);
+
 		AdjPoint = TargetHits.ImpactPoint + FVector(0, 0, Height);
+
+		LinearVelocity = TargetHits.ImpactPoint - LocationHits.ImpactPoint;
 		//DrawDebugSphere(GetWorld(), TargetHits.ImpactPoint, 10, 30, FColor::Red, false, 2.0);
 	}
 	else
 	{
 		AdjPoint = ComponentEntity()->KBESyncLocation;
+		LinearVelocity = AdjPoint - OldSyncLocation;
 	}
 
 	FRotator Rotator(0, ComponentEntity()->KBESyncDirection.Y, 0);
 	float Speed = GetMovementComponent()->GetMaxSpeed() * MaxSpeedPercentage;
 
-	FVector LinearVelocity = TargetHits.ImpactPoint - LocationHits.ImpactPoint;
+
 	if (MovementMode == MOVE_Walking)
 	{
 		LinearVelocity.Z = 0.0;
