@@ -1,13 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "KBEAccount.h"
+#include "KBEAccountEntity.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "MUEKGameMode.h"
 
 #pragma optimize("", off)
-void UKBEAccount::RespCreatePlayer_Implementation(const int32 ID, const FString &RoleName)
+void UKBEAccountEntity::RespCreatePlayer_Implementation(const int32 ID, const FString &RoleName)
 {
+	UE_LOG(LogTemp, Warning, TEXT("RespCreatePlayer_Imp....."));
 	if (bIsAutoEnterWorld)
 	{
 		Base->PlayerEnter(ID, TEXT("MapA"));
@@ -23,15 +24,15 @@ void UKBEAccount::RespCreatePlayer_Implementation(const int32 ID, const FString 
 	}
 }
 
-void UKBEAccount::RespGetRoleInfo_Implementation(const FROLEINFO &arg0)
+void UKBEAccountEntity::RespGetRoleInfo_Implementation(const FROLEINFO &arg0)
 {
-
+	UE_LOG(LogTemp, Warning, TEXT("RespGetRoleInfo_Imp....."));
 	AMUEKGameMode *GameMode = Cast<AMUEKGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (bIsAutoEnterWorld)
 	{
 		if (RoleList.Items.Num() > 0)
 		{
-			Base->PlayerEnter(RoleList.Items[0].Id, TEXT("MapA"));
+			Base->PlayerEnter(RoleList.Items[0].Id, RoleList.Items[0].Map);
 		}
 		else
 		{
@@ -49,7 +50,7 @@ void UKBEAccount::RespGetRoleInfo_Implementation(const FROLEINFO &arg0)
 		}
 	}
 }
-void UKBEAccount::CreateRole(const FString &Name)
+void UKBEAccountEntity::CreateRole(const FString &Name)
 {
 	if (RoleList.Items.Num() >= 4)
 	{
@@ -58,10 +59,14 @@ void UKBEAccount::CreateRole(const FString &Name)
 		return;
 	}
 
-	FString RoleName = *FString::Printf(TEXT("%s%d"), *Name, UKismetMathLibrary::RandomIntegerInRange(100, 900));
+	FString RoleName = Name;
+	if (!IsRunningDedicatedServer())
+	{
+		RoleName = *FString::Printf(TEXT("%s%d"), *RoleName, UKismetMathLibrary::RandomIntegerInRange(100, 900));
+	}
 	Base->OnCreatePlayer(RoleName);
 }
-const FROLEITEM *UKBEAccount::GetRoleInfo(const FString &Name)
+const FROLEITEM *UKBEAccountEntity::GetRoleInfo(const FString &Name)
 {
 
 	for (FROLEITEM &Item : RoleList.Items)
@@ -73,5 +78,4 @@ const FROLEITEM *UKBEAccount::GetRoleInfo(const FString &Name)
 	}
 	return nullptr;
 }
-
 #pragma optimize("", on)

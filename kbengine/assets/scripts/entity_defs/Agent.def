@@ -1,0 +1,57 @@
+<root>
+    <Volatile>
+        <position/>
+        <yaw/>
+        <pitch/>
+        <roll/>
+    </Volatile>
+
+    <Properties>
+        <ParentDBID>
+            <Type> INT32 </Type>
+            <Flags> ALL_CLIENTS </Flags>
+            <Persistent> true </Persistent>
+        </ParentDBID>
+        <PlayerName>
+            <Type> STRING </Type>
+            <Flags> ALL_CLIENTS </Flags>
+            <Persistent> true </Persistent>
+        </PlayerName>
+        <Map>
+            <Type> STRING </Type>
+            <Flags> ALL_CLIENTS </Flags>
+            <Persistent> true </Persistent>
+        </Map>
+    </Properties>
+
+    <ClientMethods>
+        <OnSetAgentLocation>
+        </OnSetAgentLocation>
+    </ClientMethods>
+
+    <BaseMethods>
+        <OnLeaveWorld>
+            <Exposed/>
+        </OnLeaveWorld>
+        <Logoff>
+            <Exposed/>
+        </Logoff>
+    </BaseMethods>
+
+    <CellMethods>
+        <CreateMonster>
+            <Exposed/>
+            <Arg Name=EntityClass>   STRING    </Arg>
+            <Arg Name=PlayerName>   STRING    </Arg>
+            <Arg Name=Position>   VECTOR3    </Arg>
+        </CreateMonster>
+        <SetAgentLocation>
+            <Exposed/>
+            <Arg Name=Position>   VECTOR3    </Arg>
+        </SetAgentLocation>
+        <CreateControllMonster>
+            <Exposed/>
+            <Arg>  ARRAY  <of>  CREATEMONSTERARG  </of>   </Arg>
+        </CreateControllMonster>
+    </CellMethods>
+</root>

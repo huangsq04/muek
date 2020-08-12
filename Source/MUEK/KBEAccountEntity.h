@@ -4,20 +4,19 @@
 
 #include "CoreMinimal.h"
 #include "DefineEntity.h"
-#include "KBEAccount.generated.h"
+#include "KBEAccountEntity.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MUEK_API UKBEAccount : public UAccountEntity
+class MUEK_API UKBEAccountEntity : public UAccountEntity
 {
 	GENERATED_BODY()
-public:
+public:	
+	virtual void RespCreatePlayer_Implementation(const int32 ID, const FString &RoleName) override;
 
-	virtual void RespCreatePlayer_Implementation(const int32 ID, const FString &RoleName);
-
-	virtual void RespGetRoleInfo_Implementation(const FROLEINFO &arg0);
+	virtual void RespGetRoleInfo_Implementation(const FROLEINFO &arg0) override;
 
 	void CreateRole(const FString &Name);
 
