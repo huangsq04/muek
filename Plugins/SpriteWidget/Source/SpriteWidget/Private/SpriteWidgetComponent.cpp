@@ -18,6 +18,7 @@
 #include "Engine/LevelStreaming.h"
 #include "LevelUtils.h"
 #include "Engine/TextureRenderTarget2D.h"
+#include "Materials/MaterialInstanceDynamic.h"
 #include "DynamicMeshBuilder.h"
 #include "PhysicsEngine/BodySetup.h"
 #include "IImageWrapper.h"
