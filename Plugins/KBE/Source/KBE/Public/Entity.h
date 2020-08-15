@@ -191,5 +191,6 @@ UCLASS(BlueprintType, Blueprintable)
 class KBE_API UEntityInterface : public UObject {
 	GENERATED_BODY()
 public:
+	UPROPERTY()
 	UEntity *Entity = nullptr;
 };

@@ -8,7 +8,7 @@
 void UEntity::PostInitProperties()
 {
 	Super::PostInitProperties();
-	Init();
+	//Init();
 }
 
 void UEntity::BeginDestroy()
@@ -141,6 +141,16 @@ AActor * UEntity::CreateEntityObject(const FString &Name, UObject* Outer)
 			FActorSpawnParameters SpawnParameters = FActorSpawnParameters();
 			SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 			AActor *Actor = KBE.World->SpawnActor<AActor>(Item.ClassEntity, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParameters);
+			TInlineComponentArray<UEntity*> ComponentArray;
+			Actor->GetComponents<UEntity>(ComponentArray);
+
+			if (ComponentArray.Num() != 1)
+			{
+				return nullptr;
+			}
+
+			ComponentArray[0]->Init();
+
 			return Actor;
 		}
 	}

@@ -685,7 +685,7 @@ void UKBENetConnect::OnCreatedProxies(FMemoryStream *Stream)
 {
 	uint64 rndUUID = Stream->ReadUint64();
 	int32 Eid = Stream->ReadInt32();
-	UE_LOG(LogTemp, Warning, TEXT("OnUpdatePropertys..[%d]..."), Eid);
+	UE_LOG(LogTemp, Warning, TEXT("OnCreatedProxies..[%d]..."), Eid);
 	AActor *Actor = nullptr;
 	FString EntityType = Stream->ReadString();
 	ProxyEntityID = Eid;
