@@ -1077,13 +1077,17 @@ std::string  ScriptDefModule::InitCreateUobjectHead(const std::string &name)
 	std::stringstream pret;
 	pret << "UCLASS(BlueprintType, Blueprintable)\nclass " << UEntityDef::UE4ProjectAPIName_ << "  U" <<
 		uobjectname << ": public UEntity\n{\n    GENERATED_BODY()\npublic:\n";
+	pret << "    virtual void PostInitProperties() override	\n";
+	pret << "    {\n";
+	pret << "        Super::PostInitProperties(); \n";
+	pret << "        SetClassName(TEXT(\"" << modename << "\"));\n";
+	pret << "    }\n";
 	pret << "    virtual void Init()\n";
 	pret << "    {\n";
 	pret << "    	Cell = NewObject<U" << modename << "CellMethod>();\n";
 	pret << "    	Cell->Entity = this;\n";
 	pret << "    	Base = NewObject<U" << modename << "BaseMethod>();\n";
 	pret << "    	Base->Entity = this;\n";
-	pret << "    	SetClassName(TEXT(\"" << modename << "\"));\n";
 	//if (name == "Entity")
     //		pret << "    	InitInterface(this);\n";
 	pret << "    }\n";

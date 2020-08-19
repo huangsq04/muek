@@ -1,42 +1,52 @@
 <root>
-	<Volatile>
-		<position/>
-		<yaw/>
-		<pitch/>
-		<roll/>
-	</Volatile>
+    <Volatile>
+        <position/>
+        <yaw/>
+        <pitch/>
+        <roll/>
+    </Volatile>
 
-	<Properties>
+    <Properties>
         <PlayerName>
-            <Type>    STRING </Type>
-            <Flags>            ALL_CLIENTS            </Flags>
+            <Type>    STRING    </Type>
+            <Flags>    ALL_CLIENTS    </Flags>
         </PlayerName>
-		<MoveSpeed>
-			<Type>	FLOAT					</Type>
-			<Flags>	ALL_CLIENTS				</Flags>
-		</MoveSpeed>
+        <MoveSpeed>
+            <Type>    FLOAT    </Type>
+            <Flags>    ALL_CLIENTS    </Flags>
+        </MoveSpeed>
+        <RankState>
+            <Type>    INT32    </Type>
+            <Flags>    ALL_CLIENTS    </Flags>
+        </RankState>
+    </Properties>
 
-		<AnimState>
-			<Type>	UINT8				</Type>
-			<Flags>	ALL_CLIENTS				</Flags>
-		</AnimState>
-	</Properties>
-
-	<ClientMethods>
+    <ClientMethods>
         <OnFire>
             <Arg Name=Position>   VECTOR3   </Arg>
             <Arg Name=Rotation>   VECTOR3   </Arg>
         </OnFire>
-	</ClientMethods>
+        <OnComeHere>
+        </OnComeHere>
+        <OnFollowMe>
+        </OnFollowMe>
+        <OnStopFollowMe>
+        </OnStopFollowMe>
+    </ClientMethods>
 
-	<BaseMethods>
-		
-	</BaseMethods>
+    <BaseMethods>
+        
+    </BaseMethods>
 
-	<CellMethods>
-        <ControllMonster>
+    <CellMethods>
+        <CellComeHere>
             <Exposed/>
-            <Arg Name=ID>   INT32    </Arg>
-        </ControllMonster>
-	</CellMethods>
+        </CellComeHere>
+        <CellFollowMe>
+            <Exposed/>
+        </CellFollowMe>
+        <CellStopFollowMe>
+            <Exposed/>
+        </CellStopFollowMe>
+    </CellMethods>
 </root>

@@ -34,7 +34,8 @@ void UKBEAgentEntity::OnInitPropertyFinish_Implementation()
 			const FVector &Pos = (*Itor)->GetActorLocation();
 			GetOwner()->SetActorLocation(Pos);
 			Cell->SetAgentLocation(Unreal2KBEnginePosition(Pos));
-			(*Itor)->Destroy();
+			//删除场景中放在的Agent
+			(*Itor)->ConditionalBeginDestroy();
 			break;
 		}
 	}
@@ -69,9 +70,10 @@ void UKBEAgentEntity::OnSetAgentLocation_Implementation()
 		float Range = ControlRange * ControlRange;
 		if(((*Itor)->GetActorLocation() - GetOwner()->GetActorLocation()).SizeSquared2D() < Range)
 		{
-			AgentActor.Add(ComponentArray[0]->PlayerName, (*Itor));
 			Arg.Add({ComponentArray[0]->EntityClassName, ComponentArray[0]->PlayerName, Unreal2KBEnginePosition((*Itor)->GetActorLocation())});
 		}
+		//删除场景放置的怪物
+		(*Itor)->ConditionalBeginDestroy();
 	}
 
 	//通知服务器创建和控制实体

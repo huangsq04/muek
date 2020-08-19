@@ -29,7 +29,10 @@ void UEntity::SetByControll(bool Value)
 		AKBECharacter *Character = Cast<AKBECharacter>(GetOwner());
 		if (Character)
 		{
-			//Character->KBESetRemoteRole(ROLE_Authority);
+			if (Character->Controller == NULL)
+			{
+				Character->SpawnDefaultController();
+			}
 		}
 	}
 	else
@@ -38,11 +41,6 @@ void UEntity::SetByControll(bool Value)
 		{
 			GetOwner()->Role = ROLE_Authority;
 			AKBECharacter *Character = Cast<AKBECharacter>(GetOwner());
-			if (Character)
-			{
-				Character->KBESetRemoteRole(ROLE_AutonomousProxy);
-				//Character->GetCapsuleComponent()->SetEnableGravity(false);
-			}
 		}
 		else
 		{
@@ -87,7 +85,13 @@ void UEntity::SetPosition(const FVector &Position)
 }
 void UEntity::SetDirection(const FVector &Direction)
 {
-
+	AKBECharacter *EntityActor = Cast<AKBECharacter>(GetOwner());
+	if (EntityActor)
+	{
+		FRotator Rotator(0, 0, 0);
+		Rotator.Yaw = Direction.Z;
+		EntityActor->SetActorRotation(Rotator);
+	}
 }
 float UEntity::GetSpeedPercentage()
 {
@@ -108,9 +112,8 @@ void UEntity::SetSpeedPercentage(float Percentage)
 }
  void UEntity::OnUpdateEntityDirection(const FVector &Direction)
 {
-	 FVector dir =  Direction * 360.0 / (2 * PI);
-	 KBESyncDirection = dir;
-
+	KBESyncDirection = Direction;
+	SetDirection(Direction);
 }
  void UEntity::OnUpdateEntityMovement(const FVector &Pos)
  {

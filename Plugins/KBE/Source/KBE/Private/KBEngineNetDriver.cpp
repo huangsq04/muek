@@ -13,12 +13,29 @@ void UKBEngineNetDriver::BeginDestroy()
 }
 void UKBEngineNetDriver::Tick(float DeltaTime)
 {
-	for (TPair<FString, UKBENetConnect*>& element : ServerConnects)
+	TArray<FString> FailedConnects;
+	for (TPair<FString, UKBENetConnect*>& Element : ServerConnects)
 	{
-		if (element.Value)
+		if (Element.Value)
 		{
-			element.Value->Tick(DeltaTime);
+			if (Element.Value->GetSocket() != nullptr)
+			{
+				Element.Value->Tick(DeltaTime);
+			}
+			else
+			{
+				FailedConnects.Add(Element.Key);
+				if (ServerConnect == Element.Value)
+				{
+					ServerConnect = nullptr;
+				}
+			}
 		}		
+	}
+
+	for (const FString &Item : FailedConnects)
+	{
+		ServerConnects.Remove(Item);
 	}
 }
 bool UKBEngineNetDriver::Login(const FString &Ip,
@@ -56,9 +73,10 @@ bool UKBEngineNetDriver::EnterLobby(const FString &LoginName)
 
 	if (Connect != nullptr)
 	{
-		(*Connect)->OnEnterLobby();
+		return (*Connect)->OnEnterLobby();
 	}
-	return true;
+
+	return false;
 }
 void UKBEngineNetDriver::Logoff(const FString &LoginName)
 {

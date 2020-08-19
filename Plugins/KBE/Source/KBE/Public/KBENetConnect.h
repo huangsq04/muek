@@ -163,6 +163,8 @@ public:
 
 	void RemoveEntityExceptPlayer();
 
+	FSocket *GetSocket() { return Socket; }
+
 	UFUNCTION(BlueprintCallable, Category = "Entity")
 	int32 GetProxyEntityID();
 	
@@ -219,6 +221,8 @@ private:
 
 	//被当前客户端控制的实体
 	TArray<int32> ControlledEntities;
+	TArray<int32> SyncControlledEntities;
+	int MaxSyncEntitiesNum = 20;
 
 	//缓存网络数据
 	TMap<int32, FMemoryStream*> BufferedCreateEntityMessage;
@@ -227,6 +231,8 @@ private:
 
 	//同步到服务器的玩家位置
 	FVector AckPlayerPosition;
+
+	FString LoginIP;
 
 	FString BaseappIP;
 

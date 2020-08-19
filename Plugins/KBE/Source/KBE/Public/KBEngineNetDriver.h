@@ -33,7 +33,6 @@ UCLASS()
 class KBE_API UKBEngineNetDriver : public UNetDriver 
 {
 	GENERATED_BODY()
-	
 
 public:
 

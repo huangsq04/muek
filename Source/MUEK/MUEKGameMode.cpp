@@ -26,6 +26,9 @@ AMUEKGameMode::AMUEKGameMode()
 		LoginType = 1;
 		LoginName = DefaultLoginName;
 	}
+
+	FParse::Value(FCommandLine::Get(), TEXT("LoginIp="), LoginIp);
+
 	bUseSeamlessTravel = true;
 }
 
@@ -53,7 +56,7 @@ void AMUEKGameMode::BeginPlay()
 	if (LoginType == 1)
 	{
 		//自动登陆
-		KBELogin(LoginName, LoginName);
+		KBELogin(LoginName, LoginName, TEXT(""));
 	}
 	else if (LoginType == 0)
 	{
@@ -115,15 +118,19 @@ void AMUEKGameMode::EndPlay(const EEndPlayReason::Type EndPlayReason)
 /**
  * 
  */
-void AMUEKGameMode::KBELogin(const FString& Name, const FString& Password)
+void AMUEKGameMode::KBELogin(const FString& Name, const FString& Password, const FString& ServerIP)
 {
+	if (ServerIP != TEXT(""))
+	{
+		LoginIp = ServerIP;
+	}
+
 	LoginName = Name;
 
 	FString MsgString = *FString::Printf(TEXT("LoginName=%s?LoginIP=%s"), *LoginName, *LoginIp);
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, MsgString);
 
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *MsgString);
-
 	KBENetDriver->Login(LoginIp, LoginPort, LoginName, Password);
 }
 
@@ -162,9 +169,9 @@ void AMUEKGameMode::KBELoginCallback(const FString &Name, int type, const FStrin
 		UKBEAccountEntity *Entity = Cast<UKBEAccountEntity>(KBENetDriver->GetPlayerEntity(Name));
 		if (Entity)
 		{
-			FString Msg = *FString::Printf(TEXT("%s"), TEXT("OK..."));
+			FString Msg = *FString::Printf(TEXT("%s"), TEXT("Base connect ok ."));
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, *Msg);
-			UE_LOG(LogTemp, Warning, TEXT("Base connect ok....."));
+			UE_LOG(LogTemp, Warning, TEXT("Base connect ok ."));
 			//加载玩家角色
 			Entity->Base->GetRoleInfo();
 			//设置自动登陆
@@ -175,6 +182,14 @@ void AMUEKGameMode::KBELoginCallback(const FString &Name, int type, const FStrin
 			//设置跨关卡Actor
 			TravelActor = GetPlayer();
 		}
+	}
+	else if (type == 3)
+	{
+		FString Msg = *FString::Printf(TEXT("%s"), TEXT("Base connect failed ."));
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, *Msg);
+		UE_LOG(LogTemp, Warning, TEXT("Base connect failed ."));
+
+		UGameplayStatics::OpenLevel((UObject*)this, FName(TEXT("LoginMap")), true, TEXT(""));
 	}
 }
 //链接base

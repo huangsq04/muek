@@ -4,6 +4,24 @@
 #include "Mailbox.h"
 #include "Entity.generated.h"
 class UKBENetConnect;
+
+static inline FVector Unreal2KBEngineDirection(const FVector& unrealDir)
+{
+	return unrealDir * 2 * PI / 360.0;
+}
+static inline FVector KBEngine2UnrealPosition(const FVector& KBEnginePoint)
+{
+	return FVector(KBEnginePoint[0] * 100, KBEnginePoint[2] * 100, KBEnginePoint[1] * 100);
+}
+static inline FVector Unreal2KBEnginePosition(const FVector& KBEnginePoint)
+{
+	return FVector(KBEnginePoint[0] / 100.0f, KBEnginePoint[2] / 100.0f, KBEnginePoint[1] / 100.0f);
+}
+
+static inline FVector KBEngine2UnrealDirection(const FVector& KBEngineDir)
+{
+	return KBEngineDir * 360.0 / (2 * PI);
+}
 #define __SET_ENTITY_POSITION() do                   \
 {                                                    \
     KBESyncLocation.X = 100.0f * Stream.ReadFloat(); \
@@ -16,6 +34,8 @@ class UKBENetConnect;
     KBESyncDirection.X = Stream.ReadFloat(); \
     KBESyncDirection.Y = Stream.ReadFloat(); \
     KBESyncDirection.Z = Stream.ReadFloat(); \
+	SetSpeedPercentage(KBESyncDirection.X); \
+	KBESyncDirection = KBEngine2UnrealDirection(KBESyncDirection); \
 	SetDirection(KBESyncDirection);          \
 }while (0)
 
@@ -29,14 +49,6 @@ class UKBENetConnect;
 }while (0)
 
 
-static inline FVector KBEngine2UnrealPosition(const FVector& KBEnginePoint)
-{
-	return FVector(KBEnginePoint[0] * 100, KBEnginePoint[2] * 100, KBEnginePoint[1] * 100);
-}
-static inline FVector Unreal2KBEnginePosition(const FVector& KBEnginePoint)
-{
-	return FVector(KBEnginePoint[0] / 100.0f, KBEnginePoint[2] / 100.0f, KBEnginePoint[1] / 100.0f);
-}
 /**
  * 同步到服务器的信息
  */
@@ -84,7 +96,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Entity")
 	const FString & GetClassName() { return EntityClassName; };
 
-	UFUNCTION(BlueprintNativeEvent, Category = "MUEK")
+	UFUNCTION(BlueprintNativeEvent, Category = "Entity")
 	void OnInitPropertyFinish();
 	virtual void OnInitPropertyFinish_Implementation() {};
 

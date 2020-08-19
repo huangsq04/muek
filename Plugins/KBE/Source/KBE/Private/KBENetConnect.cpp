@@ -154,6 +154,11 @@ bool UKBENetConnect::ConnectToLoginApp(FString Ip, uint16 Port, const FString &N
 		SocketSubsystem->DestroySocket(Socket);
 		Socket = nullptr;
 		SocketSubsystem = nullptr;
+		UE_LOG(LogTemp, Warning, TEXT("Error can not connect login server .....[%s][%d]..."), *Ip, Port);
+		if (Cast<UKBEngineNetDriver>(KBENetDriver)->KBELoginDelegate.IsBound())
+		{
+			Cast<UKBEngineNetDriver>(KBENetDriver)->KBELoginDelegate.Execute(UserName, 0, TEXT("Error can not connect login server ."));
+		}
 		return false;
 	}
 
@@ -174,6 +179,7 @@ bool UKBENetConnect::ConnectToLoginApp(FString Ip, uint16 Port, const FString &N
 	BundlePtr->Send(Socket);
 	delete BundlePtr;
 
+	LoginIP = Ip;
 	return true;
 }
 bool UKBENetConnect::Send(uint8* Datas, int32 Length)
@@ -338,7 +344,7 @@ void UKBENetConnect::UpdateDataToKBEServer(float DeltaTime)
 		const FSyncEntityInfo *SyncEntityInfo = PlayerEntity->GetSyncEntityInfo();
 		const FVector &Position = SyncEntityInfo->Position;
 		AckPlayerPosition = SyncEntityInfo->Position;
-		const FVector &Direction = SyncEntityInfo->Direction;
+		const FVector &Direction = Unreal2KBEngineDirection(SyncEntityInfo->Direction);
 		float Percentage = SyncEntityInfo->Percentage;
 		auto KBEPosition = FVector(Position[0] * 0.01, Position[2] * 0.01, Position[1] * 0.01);
 
@@ -353,8 +359,8 @@ void UKBENetConnect::UpdateDataToKBEServer(float DeltaTime)
 		BundlePtr->WriteFloat(KBEPosition.Z);
 
 		BundlePtr->WriteFloat(Percentage);//速度
-		BundlePtr->WriteFloat((float)((double)Direction.Y / 360 * (PI * 2)));
-		BundlePtr->WriteFloat((float)((double)Direction.Z / 360 * (PI * 2))); //旋转
+		BundlePtr->WriteFloat(Direction.Y);
+		BundlePtr->WriteFloat(Direction.Z); //旋转
 		BundlePtr->WriteUint8((uint8)(PlayerEntity->IsOnGround()));
 		BundlePtr->WriteUint32(SpaceID);
 
@@ -369,15 +375,23 @@ void UKBENetConnect::UpdateDataToKBEServer(float DeltaTime)
 	if (!CEMessagePtr)return;
 
 	//开始同步被控制了的entity的位置每次
-	for(int32 EID : ControlledEntities)
+
+	if (SyncControlledEntities.Num() == 0)
 	{
+		SyncControlledEntities = ControlledEntities;
+	}
+
+	for(int32 i = 0; i < MaxSyncEntitiesNum; i++)
+	{
+		if (SyncControlledEntities.Num() == 0) break;
+		int32 EID = SyncControlledEntities.Pop();
 		UEntity* Entity = GetEntity(EID);
 		if (!Entity->IsValidLowLevel()) continue;
 		if (!Entity->NeedSyncEntityInfo())continue;
 
 		const FSyncEntityInfo *SyncEntityInfo = Entity->GetSyncEntityInfo();
 		const FVector &Position = SyncEntityInfo->Position;
-		const FVector &Direction = SyncEntityInfo->Direction;
+		const FVector &Direction = Unreal2KBEngineDirection(SyncEntityInfo->Direction);
 		float Percentage = SyncEntityInfo->Percentage;
 		int EntityId = Entity->GetID();
 
@@ -389,8 +403,8 @@ void UKBENetConnect::UpdateDataToKBEServer(float DeltaTime)
 		CEBbundle->WriteFloat(KBEPos.Y);
 		CEBbundle->WriteFloat(KBEPos.Z);
 		CEBbundle->WriteFloat(Percentage);
-		CEBbundle->WriteFloat((float)((double)Direction.Y / 360 * (PI * 2)));
-		CEBbundle->WriteFloat((float)((double)Direction.Z / 360 * (PI * 2)));
+		CEBbundle->WriteFloat(Direction.Y);
+		CEBbundle->WriteFloat(Direction.Z);
 		CEBbundle->WriteUint8((uint8)(Entity->IsOnGround()));
 		CEBbundle->WriteUint32(SpaceID);
 		CEBbundle->Send(Socket);
@@ -502,7 +516,7 @@ void UKBENetConnect::UpdateEntityDirection(int32 InId, const FVector &InDirectio
 
 	if (Entity->IsValidLowLevel())
 	{
-		Entity->OnUpdateEntityDirection(InDirection);
+		Entity->OnUpdateEntityDirection(KBEngine2UnrealDirection(InDirection));
 	}
 }
 void UKBENetConnect::UpdateEntitySpeed(int32 InId, float Percentage)
@@ -596,11 +610,11 @@ void UKBENetConnect::OnLoginFailed(FMemoryStream *Stream)
 	}
 	if (ConnectStatus == 0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("login error  .....[%s][%s]..."), *UserName, *Error);
+		UE_LOG(LogTemp, Warning, TEXT("Login error  .....[%s][%s]..."), *UserName, *Error);
 	}		
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("base error .....[%s][%s]..."), *UserName, *Error);
+		UE_LOG(LogTemp, Warning, TEXT("Base error .....[%s][%s]..."), *UserName, *Error);
 	}
 		
 }
@@ -622,8 +636,20 @@ void UKBENetConnect::OnLoginSuccessfully(FMemoryStream *Stream)
 
 bool UKBENetConnect::OnEnterLobby()
 {
-	ConnectToBaseApp(BaseappIP, BaseappPort, UserName, Password);
-	return true;
+	bool Ret = ConnectToBaseApp(BaseappIP, BaseappPort, UserName, Password);
+	if (!Ret)
+	{
+		Ret = ConnectToBaseApp(LoginIP, BaseappPort, UserName, Password);
+	}
+
+	if (!Ret)
+	{
+		if (Cast<UKBEngineNetDriver>(KBENetDriver)->KBELoginDelegate.IsBound())
+		{
+			Cast<UKBEngineNetDriver>(KBENetDriver)->KBELoginDelegate.Execute(UserName, 3, TEXT(""));
+		}
+	}
+	return Ret;
 }
 bool UKBENetConnect::ConnectToBaseApp(FString Ip, uint16 Port, const FString &Name, const FString &InPassword)
 {
@@ -637,8 +663,10 @@ bool UKBENetConnect::ConnectToBaseApp(FString Ip, uint16 Port, const FString &Na
 		SocketSubsystem->DestroySocket(Socket);
 		Socket = nullptr;
 		SocketSubsystem = nullptr;
+		UE_LOG(LogTemp, Warning, TEXT("Error can not connect base .[%s][%d]..."), *Ip, Port);
 		return false;
 	}
+	UE_LOG(LogTemp, Warning, TEXT("Connect base ok .[%s][%d]..."), *Ip, Port);
 	ConnectStatus = 1;
 
 	FMessage **MessagePtr = nullptr;
@@ -734,6 +762,7 @@ void UKBENetConnect::OnEntityEnterWorld(FMemoryStream *Stream)
 {
 	int32 Eid = Stream->ReadInt32();
 	UE_LOG(LogTemp, Warning, TEXT("OnEntityEnterWorld..[%d]..."), Eid);
+	//当定义的entity超过255的时候这里需要改成ReadInt16
 	uint16 EntityType = Stream->ReadInt8();
 
 	if (ProxyEntityID > 0 && ProxyEntityID != Eid)
@@ -785,7 +814,13 @@ void UKBENetConnect::OnEntityEnterWorld(FMemoryStream *Stream)
 	Entity->SetCellMailbox(MailBox);
 	Entity->SetInWorld(true);
 
-	if (ProxyEntityID == Entity->EntityID || ControlledEntities.Contains(Entity->EntityID))
+	if (ProxyEntityID == Entity->EntityID) 
+	{
+		Entity->SetByControll(true);
+
+		AckPlayerPosition = Entity->KBESyncLocation;
+	}
+	else if (ControlledEntities.Contains(Entity->EntityID))
 	{
 		Entity->SetByControll(true);
 	}
@@ -828,7 +863,7 @@ void UKBENetConnect::OnSetEntityPosAndDir(FMemoryStream *Stream)
 		Direction.X = Stream->ReadFloat();
 		Direction.Y = Stream->ReadFloat();
 		Direction.Z = Stream->ReadFloat();
-		EntityPtr->SetDirection(KBEngine2UnrealPosition(Direction));
+		EntityPtr->SetDirection(KBEngine2UnrealDirection(Direction));
 	}
 }
 //玩家进入世界
@@ -996,7 +1031,7 @@ void UKBENetConnect::OnUpdateData_xz_ypr(FMemoryStream *Stream)
 	float R = INT8_TO_ANGLE(Stream->ReadInt8());
 
 	UpdateEntitySpeed(Eid, R);
-	UpdateEntityDirection(Eid, FVector(0, Y, 0));
+	UpdateEntityDirection(Eid, FVector(0, 0, Y));
 	UpdateEntityMovement(Eid, AckPlayerPosition + KBEngine2UnrealPosition(FVector(XZ[0], 0.0f, XZ[1])), 1);
 }
 void UKBENetConnect::OnUpdateData_xz(FMemoryStream *Stream)
@@ -1014,7 +1049,7 @@ void UKBENetConnect::OnUpdateData_ypr(FMemoryStream *Stream)
 	float P = INT8_TO_ANGLE(Stream->ReadInt8());
 	float R = INT8_TO_ANGLE(Stream->ReadInt8());
 
-	UpdateEntityDirection(Eid, FVector(0, Y, 0));
+	UpdateEntityDirection(Eid, FVector(0, 0, Y));
 	UpdateEntitySpeed(Eid, R);
 	UpdateEntityMovement(Eid);
 }
@@ -1028,7 +1063,7 @@ void UKBENetConnect::OnUpdateData_xyz_ypr(FMemoryStream *Stream)
 	float P = INT8_TO_ANGLE(Stream->ReadInt8());
 	float R = INT8_TO_ANGLE(Stream->ReadInt8());
 
-	UpdateEntityDirection(Eid, FVector(0, Yaw, 0));
+	UpdateEntityDirection(Eid, FVector(0, 0, Yaw));
 	UpdateEntitySpeed(Eid, R);
 	UpdateEntityMovement(Eid, AckPlayerPosition + KBEngine2UnrealPosition(FVector(XZ[0], Y, XZ[1])), 0);
 }

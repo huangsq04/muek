@@ -5,9 +5,11 @@ class Monster(KBEngine.Entity):
     def __init__(self):
         KBEngine.Entity.__init__(self)
 
-    def ControllMonster(self, arg, ID):
-        """
-        控制一个实体
-        """
-        self.controlledBy = KBEngine.entities[ID].base
+    def CellComeHere(self, arg):
+        self.allClients.OnComeHere()
 
+    def CellFollowMe(self, arg):
+        self.allClients.OnFollowMe()
+
+    def CellStopFollowMe(self, arg):
+        self.allClients.OnStopFollowMe()

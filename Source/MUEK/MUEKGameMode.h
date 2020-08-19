@@ -23,7 +23,7 @@ public:
 	virtual void GetSeamlessTravelActorList(bool bToTransition, TArray<AActor*>& ActorList);
 
 	UFUNCTION(BlueprintCallable, Category = "MUEK")
-	void KBELogin(const FString& Name, const FString& password);
+	void KBELogin(const FString& Name, const FString& Password, const FString& ServerIP);
 
 	UFUNCTION(BlueprintCallable, Category = "MUEK")
 	void KBEEnterLobby();

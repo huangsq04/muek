@@ -22,8 +22,7 @@ public:
 	virtual void OnSetAgentLocation_Implementation() override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Entity")
-	float ControlRange = 10000; //控制范围100米
+	float ControlRange = 20000; //控制范围100米
 
 private:
-	TMap<FString, AActor *> AgentActor;
 };

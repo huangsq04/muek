@@ -54,13 +54,17 @@ class MUEK_API  UAccountEntity: public UEntity
 {
     GENERATED_BODY()
 public:
+    virtual void PostInitProperties() override	
+    {
+        Super::PostInitProperties(); 
+        SetClassName(TEXT("Account"));
+    }
     virtual void Init()
     {
     	Cell = NewObject<UAccountCellMethod>();
     	Cell->Entity = this;
     	Base = NewObject<UAccountBaseMethod>();
     	Base->Entity = this;
-    	SetClassName(TEXT("Account"));
     }
     virtual bool UsePropertyDescrAlias() { return 1; };
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Entity")
@@ -186,13 +190,17 @@ class MUEK_API  URoleEntity: public UEntity
 {
     GENERATED_BODY()
 public:
+    virtual void PostInitProperties() override	
+    {
+        Super::PostInitProperties(); 
+        SetClassName(TEXT("Role"));
+    }
     virtual void Init()
     {
     	Cell = NewObject<URoleCellMethod>();
     	Cell->Entity = this;
     	Base = NewObject<URoleBaseMethod>();
     	Base->Entity = this;
-    	SetClassName(TEXT("Role"));
     }
     virtual bool UsePropertyDescrAlias() { return 1; };
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Entity")
@@ -365,13 +373,17 @@ class MUEK_API  UAgentEntity: public UEntity
 {
     GENERATED_BODY()
 public:
+    virtual void PostInitProperties() override	
+    {
+        Super::PostInitProperties(); 
+        SetClassName(TEXT("Agent"));
+    }
     virtual void Init()
     {
     	Cell = NewObject<UAgentCellMethod>();
     	Cell->Entity = this;
     	Base = NewObject<UAgentBaseMethod>();
     	Base->Entity = this;
-    	SetClassName(TEXT("Agent"));
     }
     virtual bool UsePropertyDescrAlias() { return 1; };
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Entity")
@@ -449,11 +461,24 @@ class MUEK_API UMonsterCellMethod: public UEntityServerMethod
     GENERATED_BODY()
 public:
     UFUNCTION(BlueprintCallable, Category = "Entity | Cell")
-    void ControllMonster(const int32 ID)
+    void CellComeHere()
     {
         FBundle* BundlePtr = Entity->CellMailbox()->NewMail();
         BundlePtr->WriteUint16(19);
-        BundlePtr->WriteInt32(ID);
+        Entity->CellMailbox()->PostMail(NULL);
+    }
+    UFUNCTION(BlueprintCallable, Category = "Entity | Cell")
+    void CellFollowMe()
+    {
+        FBundle* BundlePtr = Entity->CellMailbox()->NewMail();
+        BundlePtr->WriteUint16(20);
+        Entity->CellMailbox()->PostMail(NULL);
+    }
+    UFUNCTION(BlueprintCallable, Category = "Entity | Cell")
+    void CellStopFollowMe()
+    {
+        FBundle* BundlePtr = Entity->CellMailbox()->NewMail();
+        BundlePtr->WriteUint16(21);
         Entity->CellMailbox()->PostMail(NULL);
     }
 };
@@ -469,13 +494,17 @@ class MUEK_API  UMonsterEntity: public UEntity
 {
     GENERATED_BODY()
 public:
+    virtual void PostInitProperties() override	
+    {
+        Super::PostInitProperties(); 
+        SetClassName(TEXT("Monster"));
+    }
     virtual void Init()
     {
     	Cell = NewObject<UMonsterCellMethod>();
     	Cell->Entity = this;
     	Base = NewObject<UMonsterBaseMethod>();
     	Base->Entity = this;
-    	SetClassName(TEXT("Monster"));
     }
     virtual bool UsePropertyDescrAlias() { return 1; };
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Entity")
@@ -485,18 +514,18 @@ public:
     UMonsterCellMethod *Cell;
     virtual UObject *GetCell() { return Cell; };
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category = "Entity")
-    uint8 AnimState;
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category = "Entity")
     float MoveSpeed;
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category = "Entity")
     FString PlayerName;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated, Category = "Entity")
+    int32 RankState;
     bool IsSupportedForNetworking() const	{ return true;	}
     void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
     {
         Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-        DOREPLIFETIME(UMonsterEntity, AnimState);
         DOREPLIFETIME(UMonsterEntity, MoveSpeed);
         DOREPLIFETIME(UMonsterEntity, PlayerName);
+        DOREPLIFETIME(UMonsterEntity, RankState);
     }
     virtual FString OnUpdateProperty(uint16 UType, FMemoryStream& Stream)
     {
@@ -512,24 +541,33 @@ public:
                 SpaceID = Stream.ReadInt32();
                 break;
             case 3:
-                AnimState= Stream.ReadUint8();
-                Command = FString::Printf(TEXT("OnRep_AnimState"));
-                break;
-            case 4:
                 MoveSpeed= Stream.ReadFloat();
                 Command = FString::Printf(TEXT("OnRep_MoveSpeed"));
                 break;
-            case 5:
+            case 4:
                 PlayerName= Stream.ReadString();
                 Command = FString::Printf(TEXT("OnRep_PlayerName"));
+                break;
+            case 5:
+                RankState= Stream.ReadInt32();
+                Command = FString::Printf(TEXT("OnRep_RankState"));
                 break;
         }
         return Command;
     }
 
     UFUNCTION(BlueprintNativeEvent, Category = "Entity | Client")
+    void OnComeHere();
+    virtual void OnComeHere_Implementation(){};
+    UFUNCTION(BlueprintNativeEvent, Category = "Entity | Client")
     void OnFire(const FVector &Position,const FVector &Rotation);
     virtual void OnFire_Implementation(const FVector &Position,const FVector &Rotation){};
+    UFUNCTION(BlueprintNativeEvent, Category = "Entity | Client")
+    void OnFollowMe();
+    virtual void OnFollowMe_Implementation(){};
+    UFUNCTION(BlueprintNativeEvent, Category = "Entity | Client")
+    void OnStopFollowMe();
+    virtual void OnStopFollowMe_Implementation(){};
     virtual void OnRemoteMethodCall(FMemoryStream& Stream)
     {
     	    uint16 AliasID = Stream.ReadUint8();
@@ -538,11 +576,26 @@ public:
                  break;
             case 0:
             {
+               OnComeHere();
+               break;
+            }
+            case 1:
+            {
                FVector Position;
                Position= Stream.ReadFVector();
                FVector Rotation;
                Rotation= Stream.ReadFVector();
                OnFire(Position,Rotation);
+               break;
+            }
+            case 2:
+            {
+               OnFollowMe();
+               break;
+            }
+            case 3:
+            {
+               OnStopFollowMe();
                break;
             }
         }
@@ -569,13 +622,17 @@ class MUEK_API  UMapManagerEntity: public UEntity
 {
     GENERATED_BODY()
 public:
+    virtual void PostInitProperties() override	
+    {
+        Super::PostInitProperties(); 
+        SetClassName(TEXT("MapManager"));
+    }
     virtual void Init()
     {
     	Cell = NewObject<UMapManagerCellMethod>();
     	Cell->Entity = this;
     	Base = NewObject<UMapManagerBaseMethod>();
     	Base->Entity = this;
-    	SetClassName(TEXT("MapManager"));
     }
     virtual bool UsePropertyDescrAlias() { return 1; };
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Entity")

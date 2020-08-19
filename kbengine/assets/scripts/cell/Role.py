@@ -5,6 +5,8 @@ from KBEDebug import *
 class Role(KBEngine.Entity):
     def __init__(self):
         KBEngine.Entity.__init__(self)
+        self.setViewRadius(150, 5.0)
+
 
     def LevelTeleport(self, arg, MapName, Position):
         """

@@ -1,5 +1,6 @@
 #include "KBECharacter.h"
 #include "DrawDebugHelpers.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "KBE.h"
 #pragma optimize("", off)
 AKBECharacter::AKBECharacter()
@@ -92,7 +93,7 @@ void AKBECharacter::OnUpdateEntityMovement()
 		LinearVelocity = AdjPoint - OldSyncLocation;
 	}
 
-	FRotator Rotator(0, ComponentEntity()->KBESyncDirection.Y, 0);
+	FRotator Rotator(0, ComponentEntity()->KBESyncDirection.Z, 0);
 	float Speed = GetMovementComponent()->GetMaxSpeed() * MaxSpeedPercentage;
 
 
@@ -107,7 +108,6 @@ void AKBECharacter::OnUpdateEntityMovement()
 	{
 		SetActorLocation(AdjPoint);
 		SetActorRotation(Rotator);
-		//PostNetReceiveVelocity(LinearVelocity);
 	}
 	else if (Role == ROLE_SimulatedProxy)
 	{
@@ -119,7 +119,15 @@ void AKBECharacter::OnUpdateEntityMovement()
 
 		RepMovements.Push(RepMovement);
 		OldSyncLocation = ComponentEntity()->KBESyncLocation;
+		if ((RepMovement.Location - GetActorLocation()).SizeSquared() > 10000.0)
+		{
+			SetActorLocation(AdjPoint);
+			SetActorRotation(Rotator);
+		}
+		PostNetReceiveVelocity(LinearVelocity);
 	}
+
+
 }
 UEntity *AKBECharacter::ComponentEntity()
 { 
